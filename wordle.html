@@ -1,0 +1,326 @@
+<html>
+    <head>
+        <title>wordle</title>
+        <meta charset="utf-8">
+        <style>
+            body {
+                background-color: rgba(252, 242, 255, 0.5);
+            }
+
+            .game_letter {
+                border: 1px solid #000;
+                height: 3vw;
+                width: 3.6vw;
+                min-height: 30px;
+                min-width: 36px;
+                border-radius: 10px;
+                border: 1px solid rgba(136, 136, 136, 0.7);
+                line-height: 3vw;
+                text-align: center;
+                font-size: 2vw;
+                
+            }
+
+            .color_white{
+                background-color: #fff;
+            }
+
+            .correct {
+                background-color: #3dec55;
+            }
+
+            .wrong_place{
+                background-color: #d7d35e;
+            }
+
+            .wrong_letter{
+                background-color: #5b5b5b;
+            }
+
+            .word_container {
+                display: flex;
+                flex-direction: row;
+                gap: 3px;
+                justify-content: center;
+                width: fit-content;
+            }
+
+            .board_container {
+                display: flex;
+                flex-direction: column;
+                flex-wrap: none;
+                gap: 3px;
+                
+            }
+
+            #keyboard_container {
+                display: flex;
+                flex-direction: column;
+                flex-wrap: nowrap;
+                gap: 1px;
+            }
+
+            .large_container {
+                width: fit-content;
+                margin: 0 auto 0;
+            }
+
+            form {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                justify-content: center;
+            }
+
+            #user_input {
+                width: 11vw;
+                min-width: 100px;
+            }
+
+            button {
+                width: 9vw;
+                min-width: 100px;
+                font-size: 65%;
+            }
+
+
+            #user_input, button {
+                margin: 3vh 3px;
+                padding: none;
+            }
+
+            .KB_row {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                width: 100%;
+                justify-content: center;
+                gap: 1px;
+                
+            }
+
+            .KB_letter {
+                width: 1vw;
+                height: 1.5vw;
+                min-width: 20px;
+                min-height: 30px;
+                border: 1px solid #000;
+                line-height: 30px; /* NEEDS TO BE AS BIG AS THE DIV */
+                text-align: center;
+            }
+
+        </style>
+
+        <script>
+            let word = 0;
+
+            const wordArray = ['about', 'adept', 'anime', 'audio', 'basic', 
+                               'brain', 'child', 'count', 'error', 'found', 
+                               'funny', 'pilot', 'proud', 'pzzaz', 'young', 
+                               'vital'];
+            
+            function createWord(row) {
+                let wordString = "<div class=\"word_container\">";
+                
+                for(let i = 0; i < 5; i++) {
+                    
+                    wordString += "<div class=\"game_letter color_white\" id=\"r" + row + "c" + i + "\"></div>";
+                }
+                wordString += "</div>";
+                return wordString;
+            }
+
+            function createBoard() {
+                //gloobal variable to track what word the user is on
+                // only reset value when the entire board is reloaded
+
+                let boardString = ""
+                // NEED i to be a let variable so that it does not become global -- 
+                // prev problem was that my i was declared globally
+                for(let i = 0; i < 6; i++) {
+                    boardString += createWord(i);
+                }
+                document.getElementById("game_board").innerHTML = boardString;
+                answer = wordArray[Math.floor(Math.random() * wordArray.length)];
+            }
+
+            function createKeyboard() {
+                let keyboardString = "";
+                let KBRowsRaw = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
+                let KBRows = KBRowsRaw.map(row => row.split(''));
+
+                for (let i = 0; i < 3; i++) {
+                    keyboardString += "<div class=\"KB_row\">";
+                    for (let j = 0; j < KBRows[i].length; j++) {
+                        currLet = KBRows[i][j];
+                        keyboardString += "<div class=\"KB_letter color_white\" id=\"KB_" + currLet + "\">" + currLet + "</div>";
+                    }
+                    keyboardString += "</div>";
+                }
+
+                document.getElementById("keyboard_container").innerHTML = keyboardString;
+            }
+
+        </script>
+    </head>
+    <body>
+        <br/>
+        <br/>
+        <div class="board_container large_container" id="game_board"></div>
+        <script>
+            // do this at startup (could have used document.write in these 
+            // functions, but I did not know about window.load until watching 
+            // one of the JS videos, so I've been using getelement by ID and inner HTML)
+            window.onload = function() {
+                createBoard();
+            };
+
+        </script>
+
+        <form class="large_container">
+            <input type="text" id="user_input" placeholder="Guess">
+            <button type="submit" id="button">Check my Guess</button>
+        </form>
+
+        <div class="large_container" id="keyboard_container"></div>
+
+        <script>
+            createKeyboard();
+        </script>
+
+        <script>
+            document.getElementById('button').onclick = function() {
+                let guess = document.getElementById('user_input').value.toLowerCase();
+
+                // by default, clicking a submit button inside a form refreshes the page
+                // we want the page details to remain post-click
+                
+                event.preventDefault();
+                // console.log(guess);
+                // console.log(answer);
+
+                if (guess.length != 5) {
+                    alert("Your word must be 5 letters");
+                } else if (!/^[a-z]+$/.test(guess)) { // test uses reg ex. Had to look all this up (and recall some of it from cs 170), were matching from the start to the end of the string (^ and $ respectively), and checking for [a-z]+ (one or more letters). if this doesnt match for. the ENTIRE string, test will return false.
+                    alert("Your word must only contain letters");
+                } else if (word < 6) {
+                    // return an array of all correct letters in the right place at
+                    // their respective index in user's guess, non-matching
+                    // letters are returned as empty strings in their respective 'guess' indecies
+                    let rightPlace = guess.split('').map((char, idx) => {
+                        if (char === answer[idx]) return char;
+                        else return "";
+                    });
+
+                    // remaining letters that we'll use to decide yellows
+                    let remainingLetters = answer.split('').map((char, idx) => {
+                        if (char !== guess[idx]) return char;
+                        else return "";
+                    }).join('');
+
+
+                    // return an array of all correct letters in the wrong place at
+                    // their respective index in user's guess, non-matching
+                    // letters are returned as empty strings in their respective 'guess' indecies
+                    // for duplicate letters, match the number of possible yellows to the number of 
+                    // remaining non-correct occurences of the letter in question
+                    let wrongPlace = guess.split('').map((char, idx) => {
+                        if (remainingLetters.includes(char)) {
+                            // will replace only the first instance of char found in the string, essentially 'using' it up
+                            remainingLetters = remainingLetters.replace(char, '');
+                            return char;
+                        } 
+                        else return "";
+                    });
+
+                    // console.log(rightPlace);
+                    // console.log(wrongPlace);
+
+                    for (let i = 0; i < 5; i++) {
+                        // get elements based on loop iteration and word number
+                        let currElement = document.getElementById(('r' + word + 'c' + i));
+                        let currGuessLetter = guess[i];
+                        let currKey = document.getElementById('KB_' + currGuessLetter);
+                        let elemArray = [currElement, currKey];
+
+                        // 'add' the letter to the box
+                        currElement.innerHTML = currGuessLetter;
+
+                        if(rightPlace[i]) {
+                            // right letter, right place
+                            if(currKey.classList.contains("wrong_place")) {
+                                // we've already seen this element and marked it
+                                // as wrong, but correctness takes precidence on the keyboard. 
+                                changeClasses(elemArray, "correct", "wrong_place");
+                            } else {
+                                changeClasses(elemArray, "correct", "color_white");
+                            }
+                        } else if (wrongPlace[i]) {
+                            // Change the element class (and conditionally the key class if it is not already green)
+                            changeClasses((() => {
+                                if (currKey.classList.contains("correct")) return [currElement];
+                                else return elemArray;
+                            })(), "wrong_place", "color_white");
+                            
+                        } else {
+                            //the letter does not appear anywhere in the word (only change the key's class if it has not already been changed)
+                            changeClasses((() => {
+                                if (currKey.classList.contains("correct") || currKey.classList.contains("wrong_place")) return [currElement];
+                                else return elemArray;
+                            })(), "wrong_letter", "color_white");
+                        }
+                    }
+                    
+                    word++;
+                } else {
+                    // They've already enterd 6 words
+                    alert('This round is over, refresh to try agian!');
+                    // todo: rest of game winning code
+                }
+
+                // end game trigger/ condition.
+                if (guess === answer) word = 6;
+            }
+
+            //function takes an array of element(s), the class to be removed, the class to be added
+            // Purpose: helper function for my event handler
+            function changeClasses(elements, toAdd, toRemove) {
+                for(let elmCt = 0; elmCt < elements.length; elmCt++) {
+                    let currElm = elements[elmCt]
+                    if (currElm.classList.contains(toRemove)) {
+                        currElm.classList.remove(toRemove);
+                    }
+                    if(!(currElm.classList.contains(toAdd))) {
+                        currElm.classList.add(toAdd);
+                    }
+                }
+            }
+            
+        </script>
+
+    </body>
+</html>
+
+<!-- Note:
+ -- changed from the hint's board setup (using string concatination and ONE document write instead of many)
+ --     I realize in retrospect I didnt even need to do this. 
+ --
+ --
+ --
+ --
+ --
+ --
+ --
+ --
+ --
+ --
+ --
+ --
+ --
+ --
+ --
+ --
+ --
+ --
+ --
+-->
