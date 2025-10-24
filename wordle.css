@@ -1,0 +1,106 @@
+body {
+    background-color: rgba(252, 242, 255, 0.5);
+}
+
+.game_letter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #000;
+    height: 3vw;
+    width: 3.6vw;
+    min-height: 30px;
+    min-width: 36px;
+    border-radius: 10px;
+    border: 1px solid rgba(136, 136, 136, 0.7);
+    font-size: clamp(16px, 2vw, 2vw);
+    
+}
+
+.color_white{
+    background-color: #fff;
+}
+
+.correct {
+    background-color: #3dec55;
+}
+
+.wrong_place{
+    background-color: #d7d35e;
+}
+
+.wrong_letter{
+    background-color: #5b5b5b;
+}
+
+.word_container {
+    display: flex;
+    flex-direction: row;
+    gap: 3px;
+    justify-content: center;
+    width: fit-content;
+}
+
+.board_container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: none;
+    gap: 3px;
+    
+}
+
+#keyboard_container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 1px;
+}
+
+.large_container {
+    width: fit-content;
+    margin: 0 auto 0;
+}
+
+form {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+
+#user_input {
+    width: 11vw;
+    min-width: 100px;
+}
+
+button {
+    width: 9vw;
+    min-width: 100px;
+    font-size: 65%;
+}
+
+
+#user_input, button {
+    margin: 3vh 3px;
+    padding: none;
+}
+
+.KB_row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: 100%;
+    justify-content: center;
+    gap: 1px;
+    
+}
+
+.KB_letter {
+    width: 1vw;
+    height: 1.5vw;
+    min-width: 20px;
+    min-height: 30px;
+    border: 1px solid #000;
+    line-height: 30px; /* NEEDS TO BE AS BIG AS THE DIV */
+    text-align: center;
+}
